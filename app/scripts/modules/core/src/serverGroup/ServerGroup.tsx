@@ -169,7 +169,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
   }
 
   public render() {
-    const { InstanceList, RunningTasksTag } = NgReact;
+    const { AccountTag, InstanceList, RunningTasksTag } = NgReact;
     const { filter, instances, images, jenkins, isSelected, multiselect, isMultiSelected, showAllInstances, listInstances } = this.state;
     const { serverGroup, application, sortFilter, hasDiscovery, hasLoadBalancers } = this.props;
     const { account, region, name, type } = serverGroup;
@@ -194,72 +194,21 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       'sticky-header-3': this.headerIsSticky(),
     });
 
-    const col1ClassName = `col-md-${images ? 9 : 8 } col-sm-6 section-title`;
+    const col1ClassName = `col-md-${images ? 9 : 8 } col-sm-6 section-info`;
     const col2ClassName = `col-md-${images ? 3 : 4 } col-sm-6 text-right`;
 
     return (
       <div key={key} id={key} className={serverGroupClassName} onClick={this.handleServerGroupClicked}>
         <div className="cluster-container">
-          <div className={headerClassName}>
-            <div className="container-fluid no-padding">
-              <div className="row">
-                <div className={col1ClassName}>
-                  {multiselect && <input type="checkbox" checked={isMultiSelected}/>}
-
-                  <CloudProviderLogo provider={type} height="16px" width="16px"/>
-
-                  <span className="server-group-sequence"> {this.state.serverGroupSequence}</span>
-                  {(hasJenkins || hasImages) && <span>: </span>}
-                  {hasJenkins && <a href={jenkins.href} target="_blank">Build: #{jenkins.number}</a>}
-                  {hasImages && <span>{images}</span>}
-
-                  <EntityNotifications
-                    entity={serverGroup}
-                    application={application}
-                    placement="top"
-                    hOffsetPercent="20%"
-                    entityType="serverGroup"
-                    pageLocation="pod"
-                    onUpdate={application.serverGroups.refresh}
-                  />
-                </div>
-
-                <div className={col2ClassName}>
-                  <HealthCounts container={serverGroup.instanceCounts}/>
-
-                  {hasRunningExecutions && (
-                    <RunningTasksTag
-                      application={application}
-                      tasks={serverGroup.runningTasks}
-                      executions={serverGroup.runningExecutions}
-                    />
-                  )}
-
-                  {hasLoadBalancer && <LoadBalancersTagWrapper application={application} serverGroup={serverGroup}/>}
-                </div>
-              </div>
+          <div className="row">
+            <div className="col-md-8 col-sm-6">
+              <AccountTag account={serverGroup.account} />
+            </div>
+            <div className="server-group-version">
+              <CloudProviderLogo provider={type} height="16px" width="16px"/>
+              <span className="server-group-sequence"> {this.state.serverGroupSequence}</span>
             </div>
           </div>
-
-          {showAllInstances && (
-            <div className="instance-list">
-              {listInstances ? (
-                <div>
-                  <InstanceList
-                    serverGroup={serverGroup}
-                    instances={instances}
-                    sortFilter={sortFilter}
-                    hasDiscovery={hasDiscovery}
-                    hasLoadBalancers={hasLoadBalancers}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Instances highlight={filter} instances={instances}/>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     )

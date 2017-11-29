@@ -68,17 +68,14 @@ export class ClusterFilterService {
     const groups: IClusterGroup[] = [];
     const serverGroups: IServerGroup[] = this.filterServerGroupsForDisplay(application.getDataSource('serverGroups').data);
 
-    const accountGroupings = groupBy(serverGroups, 'account');
+    const clusterGroupings = groupBy(serverGroups, 'cluster');
 
-    forOwn(accountGroupings, (accountGroup: IServerGroup[], account: string) => {
-      const categoryGroupings = groupBy(accountGroup, 'category'),
+    forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
+      const categoryGroupings = groupBy(clusterGroup, 'category'),
             clusterGroups: IClusterSubgroup[] = [];
 
       forOwn(categoryGroupings, (categoryGroup: IServerGroup[], category: string) => {
-        const clusterGroupings = groupBy(categoryGroup, 'cluster');
-
-        forOwn(clusterGroupings, (clusterGroup: IServerGroup[], cluster: string) => {
-          const regionGroupings = groupBy(clusterGroup, 'region'),
+          const regionGroupings = groupBy(categoryGroup, 'region'),
                 regionGroups: IServerGroupSubgroup[] = [];
 
           forOwn(regionGroupings, (regionGroup: IServerGroup[], region: string) => {
@@ -92,7 +89,7 @@ export class ClusterFilterService {
           });
 
           const appCluster: ICluster = (application.clusters || [])
-            .find((c: ICluster) => c.account === account && c.name === cluster && c.category === category);
+            .find((c: ICluster) => c.name === cluster && c.category === category);
 
           if (appCluster) {
             clusterGroups.push({
@@ -104,12 +101,11 @@ export class ClusterFilterService {
               entityTags: (clusterGroup[0].clusterEntityTags || []).find(t => t.entityRef['region'] === '*'),
             });
           }
-        });
       });
 
       groups.push({
-        heading: account,
-        key: account,
+        heading: cluster,
+        key: cluster,
         subgroups: sortBy(clusterGroups, ['heading', 'category']),
       });
     });
