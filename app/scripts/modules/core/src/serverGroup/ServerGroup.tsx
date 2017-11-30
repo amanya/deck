@@ -184,6 +184,7 @@ export class ServerGroup extends React.Component<IServerGroupProps, IServerGroup
       'server-group': true,
       'rollup-pod-server-group': true,
       'clickable': true,
+      'flex-cluster': true,
       'clickable-row': true,
       'disabled': serverGroup.isDisabled,
       'active': isSelected,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BindAll } from 'lodash-decorators';
-import { orderBy, chunk } from 'lodash';
+import { orderBy } from 'lodash';
 
 import { ReactInjector } from 'core/reactShims';
 import { ServerGroup } from 'core/serverGroup/ServerGroup';
@@ -70,7 +70,7 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
   }
 
   private renderSubGroup(subgroup: IServerGroupSubgroup) {
-    const { grouping, application } = this.props;
+    const { grouping, application, sortFilter } = this.props;
     const sortedServerGroups = orderBy(subgroup.serverGroups, ['name'], ['desc']);
 
     return (
@@ -89,36 +89,20 @@ export class ClusterPod extends React.Component<IClusterPodProps, IClusterPodSta
           />
         </h6>
 
-        <div className="container-fluid no-padding">
-          {grouping.cluster.category === 'serverGroup' && chunk(sortedServerGroups, 3).map(this.renderServerGroupRows)}
+        <div className="horizontal wrap">
+          {grouping.cluster.category === 'serverGroup' && sortedServerGroups.map((serverGroup: IServerGroup) => (
+            <ServerGroup
+              key={serverGroup.name}
+              serverGroup={serverGroup}
+              cluster={serverGroup.cluster}
+              application={application}
+              sortFilter={sortFilter}
+              hasDiscovery={grouping.hasDiscovery}
+              hasLoadBalancers={grouping.hasLoadBalancers}
+            />
+          ))}
         </div>
       </div>
-    );
-  }
-
-  private renderServerGroupRows(serverGroupsRow: Array<IServerGroup>) {
-    return (
-      <div className="row">
-        {serverGroupsRow.map(this.renderServerGroup)}
-      </div>
-    );
-  }
-
-  private renderServerGroup(serverGroup: IServerGroup) {
-    const { grouping, application, sortFilter } = this.props;
-    const key = `${serverGroup.name}-${serverGroup.account}`;
-    return (
-      <div className="col-md-4">
-        <ServerGroup
-          key={key}
-          serverGroup={serverGroup}
-          cluster={serverGroup.cluster}
-          application={application}
-          sortFilter={sortFilter}
-          hasDiscovery={grouping.hasDiscovery}
-          hasLoadBalancers={grouping.hasLoadBalancers}
-        />
-      </div>
-    );
+    )
   }
 }
