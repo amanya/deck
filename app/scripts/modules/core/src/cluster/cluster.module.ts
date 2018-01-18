@@ -1,8 +1,9 @@
+import { react2angular } from 'react2angular';
 import { IQService, module } from 'angular';
 import { StateService } from '@uirouter/angularjs';
 
 import './clusterSearchResultType';
-import { CLUSTER_ALLCLUSTERSGROUPINGS } from './allClustersGroupings.component';
+import { AllClustersGroupings, IAllClustersGroupingsProps } from './AllClustersGroupings';
 import { ON_DEMAND_CLUSTER_PICKER_COMPONENT } from './onDemand/onDemandClusterPicker.component';
 import { PostSearchResultSearcherRegistry } from 'core/search/searchResult/PostSearchResultSearcherRegistry';
 import { SearchResultHydratorRegistry } from 'core/search/searchResult/SearchResultHydratorRegistry';
@@ -12,13 +13,18 @@ import { ApplicationReader } from 'core/application/service/application.read.ser
 
 export const CLUSTER_MODULE = 'spinnaker.core.cluster';
 
+import { OVERRIDE_REGISTRY } from 'core/overrideRegistry';
+
+console.debug(OVERRIDE_REGISTRY)
+
 module(CLUSTER_MODULE, [
   require('./allClusters.controller.js').name,
-  CLUSTER_ALLCLUSTERSGROUPINGS,
   ON_DEMAND_CLUSTER_PICKER_COMPONENT,
-])
-  .run(($q: IQService, $state: StateService, applicationReader: ApplicationReader) => {
+  OVERRIDE_REGISTRY,
+]).run(($q: IQService, $state: StateService, applicationReader: ApplicationReader) => {
     'ngInject';
+    // const AppAllClustersGroupings = overrideRegistry.getComponent<IAllClustersGroupingsProps>('allClustersGroupings') || AllClustersGroupings
     PostSearchResultSearcherRegistry.register('clusters', 'serverGroups', new ClusterPostSearchResultSearcher($q, $state));
     SearchResultHydratorRegistry.register('clusters', new ClusterSearchResultHydrator(applicationReader));
-  });
+});
+// .component('allClustersGroupings', react2angular(AppAllClustersGroupings, [ 'app', 'initialized' ]));)
